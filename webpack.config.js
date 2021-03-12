@@ -1,6 +1,6 @@
 const path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-const isDev                = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === 'development';
 module.exports = {
     entry: './src/main.js',
     devServer: {
@@ -46,7 +46,7 @@ module.exports = {
     resolve: {
         extensions: [ '.js', '.vue' ],
         alias: {
-            'vue$': isDev ? 'vue/dist/vue.runtime.js' : 'vue/dist/vue.runtime.min.js',
+            'vue$': 'vue/dist/vue.esm.js',
         }
     }
 };
