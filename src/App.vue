@@ -1,9 +1,6 @@
 <template>
     <div class="container">
         <section class="section">
-            <button class="button" @click="prev" :disabled="!info.prev">Prev</button>
-            <button class="button is-pulled-right" @click="next" :disabled="!info.next">Next</button>
-            <pagination :count="info.pages" :current="current" @naviagate="goTo"></pagination>
             <div class="columns is-multiline mt-3">
                 <div class="column is-one-fifth" v-for="character in characters" :key="character.id">
                     <card :character="character"></card>
@@ -21,6 +18,7 @@
         name: "App",
         components: {Pagination, Card},
         created(){
+            document.addEventListener('scroll', this.scroll);
             this.getData('https://rickandmortyapi.com/api/character');
         },
         data(){
@@ -36,12 +34,16 @@
         },
         methods: {
             prev(){
-                this.getData(this.info.prev);
-                this.current--;
+                if(this.info.prev) {
+                    this.getData(this.info.prev);
+                    this.current--;
+                }
             },
             next(){
+                if(this.info.next) {
                 this.getData(this.info.next);
                 this.current++;
+                }
             },
             goTo(page){
                 this.getData('https://rickandmortyapi.com/api/character/?page='+ page);
@@ -50,8 +52,14 @@
             getData(url){
                 axios.get(url).then(response => {
                     this.info = response.data.info;
-                    this.characters = response.data.results;
+                    this.characters.push(...response.data.results);
                 });
+            },
+            scroll(event){
+                console.log({current: window.pageYOffset + window.innerHeight, outerH:document.body.clientHeight});
+                if(window.pageYOffset + window.innerHeight >= document.body.clientHeight){
+                    this.next();
+                }
             }
         }
     }
