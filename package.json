@@ -20,7 +20,8 @@
     "webpack": "webpack",
     "dev": "npm run webpack -- --mode development",
     "watch": "npm run dev -- --watch",
-    "start": "webpack serve --mode development"
+    "start": "webpack serve --mode development",
+    "build": "npm run webpack -- --mode production"
   },
   "keywords": [],
   "author": "",

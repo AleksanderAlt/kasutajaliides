@@ -3,9 +3,7 @@
         <section class="section">
             <button class="button" @click="prev" :disabled="!info.prev">Prev</button>
             <button class="button is-pulled-right" @click="next" :disabled="!info.next">Next</button>
-            <div>
-                <button class="button" v-for="num in pageNumbers" :key="num">{{num}}</button>
-            </div>
+            <pagination :count="info.pages" :current="current" @naviagate="goTo"></pagination>
             <div class="columns is-multiline mt-3">
                 <div class="column is-one-fifth" v-for="character in characters" :key="character.id">
                     <card :character="character"></card>
@@ -18,14 +16,12 @@
 <script>
     import axios from 'axios';
     import Card from './components/Card';
+    import Pagination from './components/Pagination';
     export default {
         name: "App",
-        components: {Card},
+        components: {Pagination, Card},
         created(){
-            axios.get('https://rickandmortyapi.com/api/character').then(response => {
-                this.info = response.data.info;
-                this.characters = response.data.results;
-            });
+            this.getData('https://rickandmortyapi.com/api/character');
         },
         data(){
             return {
@@ -34,29 +30,28 @@
                     next: null,
                     pages: 0
                 },
-                characters: []
+                characters: [],
+                current: 1,
             }
         },
         methods: {
             prev(){
-                axios.get(this.info.prev).then(response => {
-                    this.info = response.data.info;
-                    this.characters = response.data.results;
-                });
+                this.getData(this.info.prev);
+                this.current--;
             },
             next(){
-                axios.get(this.info.next).then(response => {
+                this.getData(this.info.next);
+                this.current++;
+            },
+            goTo(page){
+                this.getData('https://rickandmortyapi.com/api/character/?page='+ page);
+                this.current=page;
+            },
+            getData(url){
+                axios.get(url).then(response => {
                     this.info = response.data.info;
                     this.characters = response.data.results;
                 });
-            }
-        },
-        computed: {
-            pageNumbers(){
-                // [null,null,null] [0,1,2]
-                let pages = [...Array(this.info.pages+1).keys()];
-                pages.shift();
-                return pages;
             }
         }
     }
