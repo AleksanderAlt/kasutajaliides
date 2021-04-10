@@ -2,7 +2,7 @@
     <div class="container">
         <section class="section">
             <div class="columns is-multiline mt-3">
-                <div class="column is-one-fifth" v-for="character in characters" :key="character.id">
+                <div class="column is-one-fifth" v-for="character in $store.state.characters" :key="character.id">
                     <card :character="character"></card>
                 </div>
             </div>
@@ -11,7 +11,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
     import Card from './components/Card';
     import Pagination from './components/Pagination';
     export default {
@@ -19,41 +18,28 @@
         components: {Pagination, Card},
         created(){
             document.addEventListener('scroll', this.scroll);
-            this.getData('https://rickandmortyapi.com/api/character');
+            this.getData('https://rickandmortyapi.com/api/character', 1);
         },
         data(){
             return {
-                info: {
-                    prev: null,
-                    next: null,
-                    pages: 0
-                },
-                characters: [],
-                current: 1,
             }
         },
         methods: {
             prev(){
-                if(this.info.prev) {
-                    this.getData(this.info.prev);
-                    this.current--;
+                if(this.$store.state.info.prev) {
+                    this.getData(this.$store.state.info.prev, this.$store.state.current - 1);
                 }
             },
             next(){
-                if(this.info.next) {
-                this.getData(this.info.next);
-                this.current++;
+                if(this.$store.state.info.next) {
+                    this.getData(this.$store.state.info.next, this.$store.state.current + 1);
                 }
             },
             goTo(page){
-                this.getData('https://rickandmortyapi.com/api/character/?page='+ page);
-                this.current=page;
+                this.getData('https://rickandmortyapi.com/api/character/?page=' + page, page);
             },
-            getData(url){
-                axios.get(url).then(response => {
-                    this.info = response.data.info;
-                    this.characters.push(...response.data.results);
-                });
+            getData(url, current){
+                this.$store.dispatch('getData', {url: url, current: current});
             },
             scroll(event){
                 console.log({current: window.pageYOffset + window.innerHeight, outerH:document.body.clientHeight});
